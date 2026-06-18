@@ -11,17 +11,17 @@ class Dictionary:
         i = hash(key) % len(self.bucket)
 
         if not self.bucket[i]:
-            self.bucket[i] = [(key, value)]
+            self.bucket[i] = [(key, hash(key), value)]
             self.length += 1
             if self.length / len(self.bucket) >= 0.75:
                 self._resize()
         else:
             for index, node in enumerate(self.bucket[i]):
                 if node[0] == key:
-                    self.bucket[i][index] = (key, value)
+                    self.bucket[i][index] = ((key, hash(key), value))
                     break
             else:
-                self.bucket[i].append((key, value))
+                self.bucket[i].append((key, hash(key), value))
                 self.length += 1
                 if self.length / len(self.bucket) >= 0.75:
                     self._resize()
@@ -29,11 +29,11 @@ class Dictionary:
     def __getitem__(self, key: Hashable) -> Any:
         i = hash(key) % len(self.bucket)
         if not self.bucket[i]:
-            raise KeyError(key)
+            raise KeyError(f"Key not found: {key}")
         for node in self.bucket[i]:
             if node[0] == key:
-                return node[1]
-        raise KeyError(key)
+                return node[2]
+        raise KeyError(f"Key not found: {key}")
 
     def __len__(self) -> int:
         return self.length
@@ -45,4 +45,4 @@ class Dictionary:
         for cell in old_bucket:
             if cell:
                 for node in cell:
-                    self[node[0]] = node[1]
+                    self[node[0]] = node[2]
